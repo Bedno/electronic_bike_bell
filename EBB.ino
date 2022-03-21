@@ -1,5 +1,5 @@
 // Electronic Bike Bell by Andrew Bedno AndrewBedno.com
-// v1.1 2022.02.15
+// v1.2 2022.03.21
 // Compile with "Huge APP" partition scheme to give at least 3MB to program.
 
 // Configure physical details for your board type.
@@ -11,12 +11,14 @@ const long BoardMHz = 80;
 
 // User interface configurables.
 const int UI_timernum = 1;
-const long LED_blinkdur = 10;  // in centisecs.
-const long SkipTimeFirst = 85;  // in centisecs.
-const long SkipTimeContinue = 70;  // in centisecs.
-const uint8_t SkipVolume = 9;  // reduced volume while skipping.
-const uint8_t MaxVolume = 127;  // full volume, 0-127 scale
-uint8_t MasterVolume = MaxVolume;  // 0-127 scale.
+const long LED_blinkdur = 10;  // Duration of LED blink at start of sound (/100s).
+const long SkipTimeFirst = 85;  // Button held time for first skip to next sound (/100s).
+const long SkipTimeContinue = 70;  // Button held time for subsequent skips (/100s).
+const long SkipHinted = SkipTimeContinue/2;  // Button held time for reduced vol in prep to skip (/100s).
+const uint8_t SkipVolume = 9;  // Reduced volume while skipping (0-127).
+const uint8_t MaxVolume = 127;  // Max possible volume, 0-127 scale due to 0-255 full wav range.
+uint8_t MasterVolume = MaxVolume;  // Current master volume, 0-127 scale.
+const float VolumeDivisor = 1;  // Master level divisor, can convert to line out level but loses too much quality. 1=0-Vmax(3.7V), 1.85=0-2V
 
 // Include WAVs
 #include "sounds\ring.h"
@@ -67,6 +69,7 @@ portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 // Adjust each wav byte to master volume with midpoint
 uint8_t Wav_VolAdj(uint8_t ByteValue,uint8_t VolumeIn) {
 	uint8_t AdjVal;
+  VolumeIn = VolumeIn / VolumeDivisor;
 	if(VolumeIn>DAC_MidVal) VolumeIn=DAC_MidVal;
 	if(ByteValue==DAC_MidVal) return ByteValue;
 	if(ByteValue>DAC_MidVal) {
@@ -172,6 +175,9 @@ void IRAM_ATTR UI_ISR() {
         if (ButtonPressed) SkipTrack = true;
       }
     }
+    if (Skip_centiSecs==(SkipTimeFirst-SkipHinted)) {
+      MasterVolume = SkipVolume;  // Decrease volume in advance of skipping.
+    }    
   } 
   // Debounce button by requiring three consecutive same states a tick apart.
   Debounce_prevprev = Debounce_prev;  Debounce_prev = Debounce_temp;
@@ -212,10 +218,15 @@ void loop() {
     if (SoundPlaying) Wav_Stop();
     // Reset everything to let next loop handle it.
     SoundPlaying = false;  PrevPlaying = false;
-    SoundNum++;  if (SoundNum>=SoundsCnt) { SoundNum = 0; }
     ConsecutiveSkip++;
     MasterVolume = SkipVolume;  // Decrease volume while skipping.
-    Skip_centiSecs = SkipTimeContinue;  // Continue skipping
+    SoundNum++;
+    if (SoundNum>=SoundsCnt) {
+      SoundNum = 0;
+      Skip_centiSecs = 2*SkipTimeContinue;  // Pause skipping longer on first sound to indicate looped.
+    } else {
+      Skip_centiSecs = SkipTimeContinue;  // Continue skipping
+    }
     digitalWrite(LED_pin, HIGH);  LED_centiSecs = LED_blinkdur;  // Flick LED.
   }
 
