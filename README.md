@@ -5,3 +5,5 @@ Starts with a classic bike bell sound.  Tap the button to play.  Hold the button
 The sounds are: ring, caw, ahooga, boat, steam, honk, bong, laughs, cheers, godzilla, howl, james, phaser, photon, beep, charge, shofar, unicorn, whistle, smash.
 
 More info in attached notes file and at https://bedno.com/ebb
+
+ALSO SEE the "Virtual Bike Bell" project which preceded this, implements more sounds in a WebApp: https://github.com/Bedno/Virtual-Bike-Bell
