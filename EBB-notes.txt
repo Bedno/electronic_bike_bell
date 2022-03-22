@@ -1,4 +1,4 @@
-Electronic Bike Bell with 20 sounds.  Built with an ESP32 microcontroller.  Connects to a bike stereo.  v1.1 2022.02.16  by Andrew Bedno AndrewBedno.com
+Electronic Bike Bell with 20 sounds.  Built with an ESP32 microcontroller.  Connects to a bike stereo.  v1.2 2022.03.21  by Andrew Bedno AndrewBedno.com
 
 Starts with a classic bike bell sound.  Tap the button to play.  Hold the button to skip through available sounds (at reduced volume) then release the button to select.  Tap the button while playing to restart the sound.
 
@@ -6,15 +6,15 @@ The sounds are: ring, caw, ahooga, boat, steam, honk, bong, laughs, cheers, godz
 
 All sounds have only one repeat on the thinking that if users want Ring Ring or Caw Caw for example they can simply repeat tap.  The on-board LED blinks once when a sound starts to give feedback of button press.  If the button seems stuck too long the device automatically goes silent.
 
-This is my third major implementation of this project.  It originally started with Bedno.com/bell - my Virtual Bike Bell webapp, which I created wanting special sounds like crow and shofar.  Though there are some electronic bike bells and noise devices, I found none with programmable sounds and aux out.  That version runs in phone browsers.  I then proceeded to try to implement in hardware for faster response and simplified use.  A prior version using a "DFplayer Mini MP3 player" audio module hit too many limits, leading to this ESP32 one.
+This is my third major implementation of this project.  It originally started with Bedno.com/bell - my Virtual Bike Bell webapp, which I created wanting special sounds like crow and shofar.  Though there are some electronic bike bells and noise devices, I found none with programmable sounds and aux out.  That version runs in phone browsers and connects with bluetooth.  I then proceeded to try to implement in hardware for faster response and simplified use.  A prior version using a "DFplayer Mini MP3 player" audio module hit too many limits, leading to this ESP32 one.
 
-The entire build required only five solder points on the ESP32 board (button,2xOut,2xGnd) and replacing the battery connector.  Conceivably one could use a touchpad input for one less wire but those don't work with gloves.  I fit the whole thing into a clear plastic case only 2"x2"x1" with a Velcro ribbon for attaching to bike.
+The entire build required only five solder points on the ESP32 board (button,2xOut,2xGnd) and replacing the battery connector.  Conceivably one could use a touchpad input for one less wire but those don't work with gloves.  I fit the whole thing into a clear plastic case only 2"x2"x1" with a Velcro ribbon for attaching to bike (plus a foam block to reduce vibration).
 
-The audio jack is directly connected to DAC (Digital to Analog Converter) output pins.  Electronics intuition is this should use a 100K/10k resistor voltage divider on each to bring the signals into a 0-.3V range as typical of line outputs.  These are shown as optional in the schematic, and may be used if connecting to a dedicated power amp for example.  But experience showed bike speakers may expect an earphone output from another device as input, presumably because that's a more common external source for them, and a Gnd-Vcc range produced full volume.  Some low pass filtering and DC blocking, or at least a limiting resistor would also make sense.  But I've had no ill effects without, a testament to the ESP32's robust IO circuitry and the input conditioning on bike stereos.
+The audio jack is directly connected to DAC (Digital to Analog Converter) output pins.  Electronics intuition is this should use a 1K/1k resistor voltage divider on each to bring the signals into a 0-2V range as typical of line outputs (shown as optional in the schematic but untested).  But experience showed bike speakers may expect an earphone output from another device as input, presumably because that's a more common external source for them, and a Gnd-Vcc range produced full volume.  Some low pass filtering and DC blocking, but I've had no ill effects without, a testament to the ESP32's robust IO circuitry and the input conditioning on bike stereos.
 
 The audio jack is wired DAC outs to tip and ring, and sleeve to ground.  Identical audio goes to both channels, dual mono as opposed to stereo, just to force speakers to recognize both.  Connecting ring to ground (which would accurately be a legacy mono plug) or bridging tip and ring caused some speakers to not work.
 
-The battery automatically charges when the device is connected to USB.  There's a tiny power switch next to the microUSB on my board which can be turned off when unused for extended periods (switch side away from USB).  But under normal use it can last many hours running despite a tiny red power LED always using some current.  In my case the ESP32 has a tinier battery connector than the battery does, but it came with the right cable and I spliced them.  Be careful when cutting and soldering battery wires to remove load and keep leads separate, and careful of solder and tool shorts as 500ma is not insignificant.  Also be careful soldering jack and button as their plastic cases melt quickly.  An audio jack wired such that the battery is disconnected when the output is unplugged would be nice, but I couldn't find a part with switched ground.
+The battery automatically charges when the device is connected to USB.  There's a tiny power switch next to the microUSB on my board which can be turned off when unused for extended periods (switch side away from USB).  But under normal use it can last many hours running despite a tiny red power LED always using some current.  In my case the ESP32 has a tinier battery connector than the battery does, but it came with the right cable and I spliced them.  Be careful when cutting and soldering battery wires to remove load and keep leads separate, and careful of solder and tool shorts as the charge is not insignificant.  Also be careful soldering jack and button as their plastic cases melt quickly.  An audio jack wired such that the battery is disconnected when the output is unplugged would be nice, but I couldn't find a part with switched ground.
 
 Any ESP32 board can run this.  I used a "mini" board because the project is simple and to make it tiny. Same with the choice of a 500mA battery.  Both actually cost slightly more than larger versions.  I also didn't want the wire wrap legs that comes on most dev boards.  My board appears to be a LilyGO v1.3 but had several pins different, also default LED setting didn't work and I had to write a test program to find it.  Check your board's doc carefully, especially regarding battery polarity.  I picked the button's pin based on ease of access.  If re-compiling presume that all pin constant assignments at the top of the program will need updating for your board and wiring needs.  I used the stock Arduino IDE, which required installing ESP32 support. There are videos on YouTube about this.  Sadly it's a slow and simple compiler.  My board required a USB driver which windows update found at some length.
 
@@ -38,13 +38,13 @@ https://www.amazon.com/dp/B07ZHCBH6Q
 Audio jack, stereo 3.5mm panel mount (x2 =$3@):
 https://www.amazon.com/dp/B07JNR4PXN
 
+Program source and schematic on GitHub:
+https://github.com/Bedno/electronic_bike_bell
+
 RESOURCES:
 
 Home page for this project:
 https://bedno.com/ebb
-
-Program source and schematic on GitHub:
-https://github.com/Bedno/electronic_bike_bell
 
 CP2104 USB to UART Bridge Controller:
 https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
@@ -65,3 +65,8 @@ https://mh-nexus.de/en/hxd/
 Audio jumper cable, high quality very short ($5.59):
 https://www.amazon.com/dp/B004G7U40Y
 
+Virtual Bike Bell webapp project which preceded this:
+https://github.com/Bedno/Virtual-Bike-Bell
+
+SCHEMATIC:
+https://bedno.com/p/a/ebb/v/EBB-Schematic-v1.png
