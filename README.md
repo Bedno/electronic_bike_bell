@@ -1,4 +1,4 @@
-Electronic Bike Bell with 20 sounds.  Built with an ESP32 microcontroller.  Connects to a bike stereo.  v1.1 2022.02.16  by Andrew Bedno AndrewBedno.com
+Electronic Bike Bell with 20 sounds.  Built with an ESP32 microcontroller.  Connects to a bike stereo.  v1.2 2022.03.21  by Andrew Bedno AndrewBedno.com
 
 Starts with a classic bike bell sound.  Tap the button to play.  Hold the button to skip through available sounds (at reduced volume) then release the button to select.  Tap the button while playing to restart the sound.
 
